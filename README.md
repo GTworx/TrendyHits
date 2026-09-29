@@ -1,0 +1,2 @@
+# TrendyHits
+Trendy Hits - Claude
