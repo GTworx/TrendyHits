@@ -12,12 +12,18 @@ export default async (req: Request) => {
 
   try {
     // 1) Create the subscriber (Kit upserts if the email already exists)
-    await kit('/subscribers', { method: 'POST', body: { email_address: email } });
+    const { subscriber } = await kit('/subscribers', { method: 'POST', body: { email_address: email } });
 
     // 2) Tag with the language tag ("TrendyHits TR" / "TrendyHits EN") and the base tag
     const tagIds = [await languageTagId(lang), await baseTagId()].filter(Boolean);
     for (const tagId of new Set(tagIds)) {
       await kit(`/tags/${tagId}/subscribers`, { method: 'POST', body: { email_address: email } });
+    }
+
+    // 3) One language per subscriber: re-subscribing in the other language switches newsletters
+    const otherTagId = await languageTagId(lang === 'tr' ? 'en' : 'tr');
+    if (subscriber?.id && otherTagId) {
+      await kit(`/tags/${otherTagId}/subscribers/${subscriber.id}`, { method: 'DELETE' }).catch(() => {});
     }
 
     return Response.json({ success: true });

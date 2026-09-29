@@ -60,8 +60,8 @@ Repo → Settings → Secrets and variables → Actions:
 
 | Workflow | Zamanlama | Ne yapar |
 | :--- | :--- | :--- |
-| `update-trends.yml` | Her gün 06:00 UTC | Orchestrator'ı çalıştırır, `trends.json`'u commit'ler → Netlify yeniden deploy eder |
-| `send-newsletter.yml` | Pazartesi 07:00 UTC | Newsletter ajanı TR/EN bültenleri Kit'e gönderir (manuel çalıştırmada varsayılan: taslak) |
+| `update-trends.yml` | Her gün 05:00 UTC (08:00 TR) | Orchestrator'ı çalıştırır, `trends.json`'u commit'ler → Netlify yeniden deploy eder |
+| `send-newsletter.yml` | Pazartesi & Cuma 06:00 UTC (09:00 TR) | TR bülteni "TrendyHits TR", EN bülteni "TrendyHits EN" etiketli abonelere gönderir (manuel çalıştırmada varsayılan: taslak) |
 
 ---
 
@@ -88,7 +88,7 @@ npx netlify-cli dev          # frontend + functions → http://localhost:8888
 4. Deploy and test `/tr/`, `/en/`, the Like button and the subscribe form.
 
 ### GitHub Actions
-Add the secrets/variables listed in the Turkish section above. `update-trends.yml` refreshes the data daily and commits it (Netlify redeploys on commit); `send-newsletter.yml` sends the weekly TR/EN newsletters through Kit Broadcasts.
+Add the secrets/variables listed in the Turkish section above. `update-trends.yml` refreshes the data daily and commits it (Netlify redeploys on commit); `send-newsletter.yml` runs every Monday and Friday at 06:00 UTC and sends the Turkish edition to "TrendyHits TR" subscribers and the English edition to "TrendyHits EN" subscribers via Kit Broadcasts.
 
 ---
 

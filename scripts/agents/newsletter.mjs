@@ -12,10 +12,14 @@ import { kit, languageTagId } from '../../shared/kit.mjs';
 
 const SITE_URL = (process.env.SITE_URL || '').replace(/\/+$/, '');
 const MODE = args.has('--send') ? 'send' : args.has('--draft') ? 'draft' : 'dry-run';
+// Sent Mondays and Fridays: Friday (and weekend) editions get the weekend subject line
+const EDITION = argValue('edition', [5, 6, 0].includes(new Date().getUTCDay()) ? 'weekend' : 'week');
+const subjectFor = (lang) => (EDITION === 'weekend' ? COPY[lang].subjectWeekend : COPY[lang].subject);
 
 const COPY = {
   tr: {
     subject: '🎧 Haftanın Hit Parçaları: Global & Türkiye Trendleri',
+    subjectWeekend: '🎧 Hafta Sonu Hitleri: Global & Türkiye Trendleri',
     global: '🌍 Global Top Hits',
     turkey: '🇹🇷 Türkiye Top Hits',
     favorites: '❤️ Topluluğun Favorileri',
@@ -26,6 +30,7 @@ const COPY = {
   },
   en: {
     subject: "🎧 This Week's Hits: Global & Turkey Trends",
+    subjectWeekend: "🎧 Weekend Hits: Global & Turkey Trends",
     global: '🌍 Global Top Hits',
     turkey: '🇹🇷 Turkey Top Hits',
     favorites: '❤️ Community Favorites',
@@ -64,6 +69,7 @@ async function editorial(data) {
     prompt: `WORKFLOW adım 2 için sadece editoryal metinleri üret (HTML'i kod oluşturacak).
 Global ilk 10:\n${brief(data.global)}\n\nTürkiye ilk 10:\n${brief(data.turkey)}
 
+Bu sayı: ${EDITION === 'weekend' ? 'Cuma / hafta sonu sayısı (hafta sonuna enerjik bir kapanış)' : 'Pazartesi / hafta başı sayısı (haftaya enerjik bir başlangıç)'}.
 Kurallar: preview_text 1 cümle, konu satırını tekrar etmesin. intro 2-3 cümle, enerjik; somut sanatçı/parça adları geçsin.
 EN metinleri TR'nin çevirisi DEĞİL, doğal İngilizce yazılmış olsun. Emoji en fazla 1.`,
     schema: {
@@ -117,7 +123,7 @@ function favoritesBlock(data, lang) {
 function buildHtml(data, lang, copy) {
   const c = COPY[lang];
   const siteLink = `${SITE_URL || 'https://trendyhits.netlify.app'}/${lang}/`;
-  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(c.subject)}</title>
+  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(subjectFor(lang))}</title>
 <style>@media (max-width:620px){.col{display:block!important;width:100%!important;padding:0 0 16px!important}}</style></head>
 <body style="margin:0;padding:0;background:#f4f4f5;">
 <div style="display:none;max-height:0;overflow:hidden;">${esc(copy.preview_text)}</div>
@@ -145,9 +151,9 @@ async function dispatch(lang, html, copy) {
   const tagId = await languageTagId(lang);
   const sendAt = MODE === 'send' ? argValue('send-at', new Date(Date.now() + 10 * 60_000).toISOString()) : null;
   const body = {
-    subject: COPY[lang].subject,
+    subject: subjectFor(lang),
     preview_text: copy.preview_text,
-    description: `TrendyHits haftalık bülten - ${lang.toUpperCase()}`,
+    description: `TrendyHits bülten (${EDITION === 'weekend' ? 'Cuma' : 'Pazartesi'}) - ${lang.toUpperCase()}`,
     content: html,
     public: false,
     send_at: sendAt,
@@ -173,6 +179,13 @@ async function main() {
   log('Newsletter', 'wrote out/newsletter-tr.html, out/newsletter-en.html');
 
   if (MODE === 'dry-run') {
+    if (process.env.KIT_API_KEY) {
+      for (const lang of ['tr', 'en']) {
+        const tagId = await languageTagId(lang);
+        const { subscribers } = await kit(`/tags/${tagId}/subscribers?per_page=1000`);
+        log('Newsletter', `${lang.toUpperCase()} audience: tag ${tagId} → ${subscribers.length} active subscriber(s) get newsletter-${lang}.html`);
+      }
+    }
     log('Newsletter', 'dry run — nothing sent (use --draft or --send)');
     return;
   }

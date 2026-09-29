@@ -188,9 +188,9 @@ newsletter.error, footer.sources, footer.previews, lang.tr, lang.en`
 - README'ye (TR + EN) deploy adımlarını yaz: repo'yu Netlify'a bağla → env değişkenlerini gir → DB tablosunu oluştur → deploy.
 
 # OTOMASYON
-- `.github/workflows/update-trends.yml`: Günlük cron ile Orchestrator prompt'unu ("TrendyHits 1.md" Bölüm 2) çalıştırıp
+- `.github/workflows/update-trends.yml`: Günlük cron ile (05:00 UTC / 08:00 TR) Orchestrator prompt'unu ("TrendyHits 1.md" Bölüm 2) çalıştırıp
   `public/data/trends.json`'u günceller ve commit'ler; Netlify commit'i görünce otomatik yeniden deploy eder.
-- `.github/workflows/send-newsletter.yml`: Haftalık cron ile Newsletter ajanını ("TrendyHits 2.md" Bölüm 4) çalıştırır.
+- `.github/workflows/send-newsletter.yml`: Pazartesi ve Cuma sabahları (06:00 UTC / 09:00 TR, trend güncellemesinden sonra) Newsletter ajanını ("TrendyHits 2.md" Bölüm 4) çalıştırır.
 
 # KABUL KRİTERLERİ
 - `npm run build` hatasız biter; `dist/` Netlify'da statik olarak servis edilebilir.

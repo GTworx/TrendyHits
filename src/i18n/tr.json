@@ -1,7 +1,7 @@
 {
   "app.title": "TrendyHits",
   "app.tagline": "Dünyada ve Türkiye'de şu an en çok dinlenenler",
-  "app.metaDescription": "TrendyHits: Global ve Türkiye müzik listelerinde şu an zirvede olan parçalar. Favorini beğen, haftalık bültene abone ol.",
+  "app.metaDescription": "TrendyHits: Global ve Türkiye müzik listelerinde şu an zirvede olan parçalar. Favorini beğen, Pazartesi ve Cuma bültenine abone ol.",
   "header.lastUpdated": "Son güncelleme",
   "lists.global": "🌍 Global Top Hits",
   "lists.turkey": "🇹🇷 Türkiye Top Hits",
@@ -18,7 +18,7 @@
   "state.error": "Trend verisi yüklenemedi. Lütfen sayfayı yenile.",
   "state.likeError": "Beğeni kaydedilemedi, lütfen tekrar dene.",
   "newsletter.title": "Trendleri e-posta ile al",
-  "newsletter.description": "Her hafta Global ve Türkiye listeleri gelen kutunda.",
+  "newsletter.description": "Her Pazartesi ve Cuma sabahı Global ve Türkiye listeleri gelen kutunda.",
   "newsletter.placeholder": "E-posta adresin",
   "newsletter.submit": "Abone ol",
   "newsletter.sending": "Gönderiliyor…",

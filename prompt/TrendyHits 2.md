@@ -2,7 +2,7 @@ Bu sistemi uçtan uca hayata geçirmek için gereken mimariyi **3 katman** halin
 
 > 1. **Arayüz & Etkileşim (Frontend, statik):** Vite + React ile iki dilli (`/tr/`, `/en/`) dashboard: sol ve sağ listeler, her parçanın yanında kapak görseli (thumbnail), 30 sn ses önizlemesi (▶️), canlı Like butonu ve alt kısımda Kit (kit.com) ile entegre bülten abonelik formu.
 > 2. **Arka Plan & Veritabanı (Netlify Functions + Postgres):** Like sayılarını tutan ve Kit API v4'e yeni aboneyi **dil etiketiyle** ekleyen serverless fonksiyonlar.
-> 3. **Agentic AI & Otomasyon (Newsletter Sender):** Belirli periyotlarla (örneğin haftada 1) trend listelerini çıkaran ve Kit Broadcasts API üzerinden abonelere **kendi dillerinde** şık bir e-posta bülteni gönderen ajan.
+> 3. **Agentic AI & Otomasyon (Newsletter Sender):** Haftada iki kez (Pazartesi ve Cuma sabahları) trend listelerini çıkaran ve Kit Broadcasts API üzerinden abonelere **kendi dillerinde** şık bir e-posta bülteni gönderen ajan.
 
 Aşağıda bu sistemi oluşturmak için **Veritabanı**, **Frontend & i18n**, **Netlify Functions & Kit Entegrasyonu**, **Agentic AI E-posta Gönderim Prompt'u** ve **Netlify Deploy** ayarlarını bulabilirsiniz. Trend verisinin şeması ve Dashboard Builder prompt'u için bkz. **TrendyHits 1.md**.
 
@@ -42,7 +42,7 @@ Tüm arayüz metinleri çeviri dosyalarından gelir; bileşenlerde hard-code met
   "track.openApple": "Apple Music'te aç",
   "track.previewError": "Önizleme oynatılamadı.",
   "newsletter.title": "Trendleri e-posta ile al",
-  "newsletter.description": "Her hafta Global ve Türkiye listeleri gelen kutunda.",
+  "newsletter.description": "Her Pazartesi ve Cuma sabahı Global ve Türkiye listeleri gelen kutunda.",
   "newsletter.placeholder": "E-posta adresin",
   "newsletter.submit": "Abone ol",
   "newsletter.success": "Bültene başarıyla kaydoldun!",
@@ -69,7 +69,7 @@ Tüm arayüz metinleri çeviri dosyalarından gelir; bileşenlerde hard-code met
   "track.openApple": "Open in Apple Music",
   "track.previewError": "Couldn't play the preview.",
   "newsletter.title": "Get the trends by email",
-  "newsletter.description": "Global and Turkey charts in your inbox every week.",
+  "newsletter.description": "Global and Turkey charts in your inbox every Monday and Friday morning.",
   "newsletter.placeholder": "Your email address",
   "newsletter.submit": "Subscribe",
   "newsletter.success": "You're subscribed to the newsletter!",
@@ -242,7 +242,7 @@ export const config: Config = { path: '/api/likes', method: 'GET' };
 
 #### **B. Bültene Abone Kaydetme (Kit API v4)**
 
-Kullanıcı formu doldurduğunda Kit'te abone (Subscriber) oluşturulur ve seçtiği dile göre **"TrendyHits TR"** veya **"TrendyHits EN"** etiketine (Tag) eklenir. Kit'te abone grupları Tag (veya Form) ile yönetilir; bülten gönderiminde bu etiketler dil filtresi olarak kullanılır:
+Kullanıcı formu doldurduğunda Kit'te abone (Subscriber) oluşturulur ve seçtiği dile göre **"TrendyHits TR"** veya **"TrendyHits EN"** etiketine (Tag) eklenir. Her abonenin **tek bir dil etiketi** olur: aynı e-posta diğer dilde tekrar abone olursa eski dil etiketi kaldırılır; böylece kimse iki bülten birden almaz. Kit'te abone grupları Tag (veya Form) ile yönetilir; bülten gönderiminde bu etiketler dil filtresi olarak kullanılır:
 
 ```ts
 // netlify/functions/subscribe.mts  →  POST /api/subscribe   body: { email, language }
@@ -278,10 +278,14 @@ export default async (req: Request) => {
 
   try {
     // 1) Aboneyi oluştur (e-posta zaten varsa Kit mevcut kaydı günceller / döndürür)
-    await kit('/subscribers', { email_address: email });
+    const { subscriber } = await kit('/subscribers', { email_address: email });
 
     // 2) Aboneyi dil etiketine ekle
     await kit(`/tags/${TAGS[lang]}/subscribers`, { email_address: email });
+
+    // 3) Tek dil: diğer dil etiketini kaldır (DELETE /v4/tags/{tag_id}/subscribers/{subscriber_id})
+    const other = TAGS[lang === 'tr' ? 'en' : 'tr'];
+    await fetch(`${KIT_API}/tags/${other}/subscribers/${subscriber.id}`, { method: 'DELETE', headers: { 'X-Kit-Api-Key': process.env.KIT_API_KEY! } });
 
     return Response.json({ success: true });
   } catch (error) {
@@ -298,7 +302,7 @@ export const config: Config = { path: '/api/subscribe', method: 'POST' };
 
 ### **4. Agentic AI Newsletter Kurgusu (Ajan Rolü ve Prompt)**
 
-Bu aşamada çalışan **"Music Newsletter Dispatcher Agent"** haftalık olarak GitHub Actions (`.github/workflows/send-newsletter.yml`) üzerinden tetiklenir ve üç görevi yerine getirir:
+Bu aşamada çalışan **"Music Newsletter Dispatcher Agent"** her **Pazartesi ve Cuma sabahı** (06:00 UTC / 09:00 TR — günlük trend güncellemesi 05:00 UTC'de tamamlandıktan sonra) GitHub Actions (`.github/workflows/send-newsletter.yml`) üzerinden tetiklenir ve üç görevi yerine getirir:
 
 > 1. Canlı sitedeki güncel listeleri (`https://<site>.netlify.app/data/trends.json`) ve en çok like alan parçaları (`/api/likes`) bir araya getirir.
 > 2. **Türkçe ve İngilizce** olmak üzere iki ayrı modern HTML e-posta üretir.
@@ -317,7 +321,7 @@ kendi abone kitlesine göndermektir.
 
 # CONTEXT & TOOLS
 - HTTP Fetch Tool: `{{SITE_URL}}/data/trends.json` (trend listeleri + `artwork_url` / `preview_url` / `apple_music_url`) ve `{{SITE_URL}}/api/likes` (beğeni sayıları).
-- Kit Broadcast Tool / API: Bülten içeriğini ilgili dil etiketine (KIT_TAG_ID_TR / KIT_TAG_ID_EN) sahip abonelere Broadcast olarak gönderir.
+- Kit Broadcast Tool / API: Türkçe bülteni (`<html lang="tr">`, CTA → `/tr/`) yalnızca KIT_TAG_ID_TR etiketli abonelere, İngilizce bülteni (`<html lang="en">`, CTA → `/en/`) yalnızca KIT_TAG_ID_EN etiketli abonelere Broadcast olarak gönderir.
 
 ---
 
@@ -329,9 +333,10 @@ kendi abone kitlesine göndermektir.
    - Her iki listede en çok beğenilen ilk 3 parçayı "Topluluğun Favorileri / Community Favorites" olarak işaretle.
 
 2. NEWSLETTER CONTENT COMPILATION (her dil için ayrı):
-   - Konu satırı:
-     * TR: "🎧 Haftanın Hit Parçaları: Global & Türkiye Trendleri"
-     * EN: "🎧 This Week's Hits: Global & Turkey Trends"
+   - Konu satırı (sayıya göre):
+     * Pazartesi — TR: "🎧 Haftanın Hit Parçaları: Global & Türkiye Trendleri" · EN: "🎧 This Week's Hits: Global & Turkey Trends"
+     * Cuma — TR: "🎧 Hafta Sonu Hitleri: Global & Türkiye Trendleri" · EN: "🎧 Weekend Hits: Global & Turkey Trends"
+   - Giriş yazısının tonu sayıya uyar: Pazartesi haftaya başlangıç, Cuma hafta sonuna kapanış.
    - Önizleme metni (preview text): 1 cümle, konu satırını tekrar etme.
    - Giriş: Kısa, enerjik bir editoryal giriş yazısı. EN metni TR'nin birebir çevirisi değil, doğal İngilizce yazılmış olsun.
    - 2 Sütunlu Responsive HTML Kart Tasarımı (tablo tabanlı, inline CSS, mobilde alt alta):
@@ -448,8 +453,8 @@ GitHub Actions tarafında (Repo > Settings > Secrets): `KIT_API_KEY`, `KIT_TAG_I
                                                                          ──> ["TrendyHits TR" / "TrendyHits EN" etiketli aboneler]
 
 [ Otomasyon — GitHub Actions ]
-├── Günlük:   Orchestrator Agent ──> Media Enricher (iTunes: kapak + önizleme) ──> public/data/trends.json commit ──> Netlify otomatik yeniden deploy
-└── Haftalık: Newsletter Agent
+├── Günlük 05:00 UTC: Orchestrator Agent ──> Media Enricher (iTunes: kapak + önizleme) ──> public/data/trends.json commit ──> Netlify otomatik yeniden deploy
+└── Pazartesi & Cuma 06:00 UTC: Newsletter Agent
       ├── 1. trends.json + /api/likes verilerini analiz eder.
       ├── 2. TR ve EN olmak üzere iki responsive HTML bülten derler (kapak görselleri + Apple Music linkleri).
       └── 3. Kit Broadcasts API ile her dili kendi etiketli abonelerine postalar.

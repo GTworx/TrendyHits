@@ -1,7 +1,7 @@
 {
   "app.title": "TrendyHits",
   "app.tagline": "What the world and Turkey are listening to right now",
-  "app.metaDescription": "TrendyHits: the tracks topping the global and Turkish charts right now. Like your favorites and get the weekly newsletter.",
+  "app.metaDescription": "TrendyHits: the tracks topping the global and Turkish charts right now. Like your favorites and get the Monday & Friday newsletter.",
   "header.lastUpdated": "Last updated",
   "lists.global": "🌍 Global Top Hits",
   "lists.turkey": "🇹🇷 Turkey Top Hits",
@@ -18,7 +18,7 @@
   "state.error": "Couldn't load the trend data. Please refresh the page.",
   "state.likeError": "Couldn't save your like, please try again.",
   "newsletter.title": "Get the trends by email",
-  "newsletter.description": "Global and Turkey charts in your inbox every week.",
+  "newsletter.description": "Global and Turkey charts in your inbox every Monday and Friday morning.",
   "newsletter.placeholder": "Your email address",
   "newsletter.submit": "Subscribe",
   "newsletter.sending": "Sending…",
