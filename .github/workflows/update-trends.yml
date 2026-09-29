@@ -1,0 +1,40 @@
+name: Update trends
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # daily 06:00 UTC (09:00 TR)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-trends
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run Orchestrator agent (Global + TR research -> Validator -> trends.json)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+          WEB_SEARCH: ${{ vars.WEB_SEARCH }}
+        run: npm run agents:trends
+      - name: Commit updated trends
+        run: |
+          if git diff --quiet -- public/data/trends.json; then
+            echo "No changes"; exit 0
+          fi
+          git config user.name "trendyhits-bot"
+          git config user.email "trendyhits-bot@users.noreply.github.com"
+          git add public/data/trends.json
+          git commit -m "chore(data): update trends $(date -u +%Y-%m-%d)"
+          git push

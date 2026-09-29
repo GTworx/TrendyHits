@@ -1,0 +1,457 @@
+{
+  "last_updated": "2026-09-29T19:30:28Z",
+  "global_trends": [
+    {
+      "id": "global-taylor-swift-patient-zero",
+      "rank": 1,
+      "artist": "Taylor Swift",
+      "track": "Patient Zero",
+      "note_tr": "Yeni pop hiti, listeleri domine ediyor",
+      "note_en": "New pop hit dominating the charts",
+      "source": "Spotify Global, Apple Music US/UK"
+    },
+    {
+      "id": "global-karol-g-judeline-and-rusowsky-bby-wow",
+      "rank": 2,
+      "artist": "KAROL G, Judeline & rusowsky",
+      "track": "BbY WOW",
+      "note_tr": "Latin pop ve alternatif müzik füzyonu",
+      "note_en": "Latin pop and alternative music fusion",
+      "source": "Spotify Global, Billboard, Apple Music US"
+    },
+    {
+      "id": "global-ella-langley-choosin-texas",
+      "rank": 3,
+      "artist": "Ella Langley",
+      "track": "Choosin' Texas",
+      "note_tr": "Country müzikte hızla yükselen yeni yıldız",
+      "note_en": "Fast rising star in country music",
+      "source": "Billboard, Apple Music US/UK"
+    },
+    {
+      "id": "global-adela-nicole-kidman",
+      "rank": 4,
+      "artist": "ADÉLA",
+      "track": "Nicole Kidman",
+      "note_tr": "Sosyal medyada viral olan pop başarısı",
+      "note_en": "Viral pop success on social media",
+      "source": "Spotify Global, Billboard, Apple Music US/UK"
+    },
+    {
+      "id": "global-olivia-rodrigo-stupid-song",
+      "rank": 5,
+      "artist": "Olivia Rodrigo",
+      "track": "stupid song",
+      "note_tr": "Alternatif pop listelerinde zirveye oynuyor",
+      "note_en": "Challenging the top of alternative pop",
+      "source": "Spotify Global, Billboard, Apple Music US/UK"
+    },
+    {
+      "id": "global-taylor-swift-babylon",
+      "rank": 6,
+      "artist": "Taylor Swift",
+      "track": "Babylon",
+      "note_tr": "Yeni albümün en çok dinlenen parçası",
+      "note_en": "Most streamed track from new album",
+      "source": "Spotify Global, Apple Music US/UK"
+    },
+    {
+      "id": "global-olivia-dean-man-i-need",
+      "rank": 7,
+      "artist": "Olivia Dean",
+      "track": "Man I Need",
+      "note_tr": "Soul ve pop etkileşimli yükselen parça",
+      "note_en": "Rising track with soul and pop influence",
+      "source": "Spotify Global, Billboard, Apple Music US/UK"
+    },
+    {
+      "id": "global-taylor-swift-cleveland",
+      "rank": 8,
+      "artist": "Taylor Swift",
+      "track": "Cleveland!",
+      "note_tr": "Dijital platformlarda yüksek dinlenme oranına sahip",
+      "note_en": "High streaming numbers on digital platforms",
+      "source": "Spotify Global, Apple Music US/UK"
+    },
+    {
+      "id": "global-drake-janice-stfu",
+      "rank": 9,
+      "artist": "Drake",
+      "track": "Janice STFU",
+      "note_tr": "Hip-hop listelerine çok güçlü bir giriş",
+      "note_en": "Very strong entry into hip-hop charts",
+      "source": "Billboard, Apple Music US/UK"
+    },
+    {
+      "id": "global-olivia-rodrigo-the-cure",
+      "rank": 10,
+      "artist": "Olivia Rodrigo",
+      "track": "the cure",
+      "note_tr": "Genç dinleyiciler arasında son derece popüler",
+      "note_en": "Extremely popular among younger audiences",
+      "source": "Spotify Global, Billboard, Apple Music US/UK"
+    },
+    {
+      "id": "global-sienna-spiro-great-expectation",
+      "rank": 11,
+      "artist": "SIENNA SPIRO",
+      "track": "Great Expectation",
+      "note_tr": "İngiltere müzik listelerinde dikkat çeken çıkış",
+      "note_en": "Notable debut on UK music charts",
+      "source": "Spotify Global, Apple Music US/UK"
+    },
+    {
+      "id": "global-stella-lefty-boston",
+      "rank": 12,
+      "artist": "STELLA LEFTY",
+      "track": "Boston",
+      "note_tr": "Yeni çıkan bağımsız pop müzik hiti",
+      "note_en": "Newly released indie pop music hit",
+      "source": "Billboard, Apple Music US/UK"
+    },
+    {
+      "id": "global-taylor-swift-pink-clouding",
+      "rank": 13,
+      "artist": "Taylor Swift",
+      "track": "Pink Clouding",
+      "note_tr": "Popüler albümün en çok sevilen şarkısı",
+      "note_en": "Most loved song from popular album",
+      "source": "Spotify Global, Apple Music US/UK"
+    },
+    {
+      "id": "global-adela-ain-t-in-la",
+      "rank": 14,
+      "artist": "ADÉLA",
+      "track": "Ain't In LA",
+      "note_tr": "Alternatif pop listelerinde istikrarlı bir grafik",
+      "note_en": "Consistent performance in alternative pop charts",
+      "source": "Spotify Global, Billboard, Apple Music UK"
+    },
+    {
+      "id": "global-ariana-grande-hate-that-i-made-you-love-me",
+      "rank": 15,
+      "artist": "Ariana Grande",
+      "track": "hate that i made you love me",
+      "note_tr": "Duygusal pop türünde etkileyici bir hit",
+      "note_en": "Impressive hit in emotional pop genre",
+      "source": "Spotify Global, Billboard, Apple Music UK"
+    },
+    {
+      "id": "global-taylor-swift-the-fate-of-ophelia",
+      "rank": 16,
+      "artist": "Taylor Swift",
+      "track": "The Fate of Ophelia",
+      "note_tr": "Müzik platformlarında zirvede yer alan parça",
+      "note_en": "Track sitting at top of platforms",
+      "source": "Spotify Global, Apple Music US/UK"
+    },
+    {
+      "id": "global-malcolm-todd-earrings",
+      "rank": 17,
+      "artist": "Malcolm Todd",
+      "track": "Earrings",
+      "note_tr": "Sosyal medyada viral olan indie pop",
+      "note_en": "Viral indie pop track on socials",
+      "source": "Spotify Global, Billboard"
+    },
+    {
+      "id": "global-shakira-and-burna-boy-dai-dai",
+      "rank": 18,
+      "artist": "Shakira & Burna Boy",
+      "track": "Dai Dai",
+      "note_tr": "Dünya kupası etkisiyle küresel çapta yükselişte",
+      "note_en": "Globally rising with World Cup influence",
+      "source": "Spotify Global, Billboard, Apple Music UK"
+    },
+    {
+      "id": "global-dominic-fike-babydoll",
+      "rank": 19,
+      "artist": "Dominic Fike",
+      "track": "Babydoll",
+      "note_tr": "Alternatif rock listelerinde oldukça popüler parça",
+      "note_en": "Highly popular track in alternative rock",
+      "source": "Spotify Global, Billboard"
+    },
+    {
+      "id": "global-tame-impala-loser",
+      "rank": 20,
+      "artist": "Tame Impala",
+      "track": "Loser",
+      "note_tr": "Psikedelik pop türünde büyük liste başarısı",
+      "note_en": "Great chart success in psychedelic pop",
+      "source": "Spotify Global, Billboard"
+    },
+    {
+      "id": "global-sombr-my-body-isn-t-ready",
+      "rank": 21,
+      "artist": "sombr",
+      "track": "My Body Isn't Ready",
+      "note_tr": "Yeni nesil indie pop tarzında eser",
+      "note_en": "New generation indie pop style track",
+      "source": "Billboard, Apple Music UK"
+    },
+    {
+      "id": "global-mac-miller-cinderella-feat-ty-dolla-ign",
+      "rank": 22,
+      "artist": "Mac Miller",
+      "track": "Cinderella (feat. Ty Dolla $ign)",
+      "note_tr": "Klasikleşen hip-hop ve R&B iş birliği",
+      "note_en": "Classic hip-hop and R&B collaboration",
+      "source": "Spotify Global, Billboard, Apple Music US"
+    },
+    {
+      "id": "global-alex-warren-ordinary",
+      "rank": 23,
+      "artist": "Alex Warren",
+      "track": "Ordinary",
+      "note_tr": "Duygusal ballad türünde yükselişe geçen şarkı",
+      "note_en": "Emotional ballad rising on the charts",
+      "source": "Spotify Global, Apple Music UK"
+    },
+    {
+      "id": "global-katseye-animal",
+      "rank": 24,
+      "artist": "KATSEYE",
+      "track": "Animal",
+      "note_tr": "Global pop grubunun dikkat çeken çıkışı",
+      "note_en": "Notable debut from global pop group",
+      "source": "Spotify Global, Billboard"
+    },
+    {
+      "id": "global-bruno-mars-risk-it-all",
+      "rank": 25,
+      "artist": "Bruno Mars",
+      "track": "Risk It All",
+      "note_tr": "R&B listelerinde güçlü performans gösteren hit",
+      "note_en": "Strong performing hit in R&B charts",
+      "source": "Spotify Global, Billboard"
+    }
+  ],
+  "turkey_trends": [
+    {
+      "id": "tr-blok3-sebebi-yar",
+      "rank": 1,
+      "artist": "BLOK3",
+      "track": "Sebebi Yar",
+      "note_tr": "Melodik rap türünde liste başı popüler",
+      "note_en": "Chart-topping popular melodic rap track",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-bora-duran-dondum",
+      "rank": 2,
+      "artist": "Bora Duran",
+      "track": "Döndüm",
+      "note_tr": "Akustik pop türünde sevilen radyo hiti",
+      "note_en": "Popular radio hit in acoustic pop",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-blok3-kayip-kalp",
+      "rank": 3,
+      "artist": "BLOK3",
+      "track": "Kayıp Kalp",
+      "note_tr": "Melodik rap tarzında duygusal trend parça",
+      "note_en": "Emotional trend track in melodic rap",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-blok3-feat-poizi-cok-guzel-guluyorsun",
+      "rank": 4,
+      "artist": "BLOK3 feat. Poizi",
+      "track": "Çok Güzel Gülüyorsun",
+      "note_tr": "Rap-pop tarzında başarılı iş birliği hiti",
+      "note_en": "Successful rap-pop collaboration hit",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-blok3-kirginim",
+      "rank": 5,
+      "artist": "BLOK3",
+      "track": "Kırgınım",
+      "note_tr": "Melodik rap türünde sosyal medya trendi",
+      "note_en": "Social media trend in melodic rap",
+      "source": "Spotify TR, Apple Music TR, YouTube TR"
+    },
+    {
+      "id": "tr-manifest-toz-pembe",
+      "rank": 6,
+      "artist": "manifest",
+      "track": "Toz Pembe",
+      "note_tr": "Alternatif pop ve indie elektronik hit",
+      "note_en": "Alternative pop and indie electronic hit",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-crush-benim-olsana",
+      "rank": 7,
+      "artist": "CRUSH",
+      "track": "Benim Olsana",
+      "note_tr": "R&B-pop tarzında dans ve koreografi trendi",
+      "note_en": "Dance and choreography trend in R&B-pop",
+      "source": "Spotify TR, Apple Music TR, YouTube TR"
+    },
+    {
+      "id": "tr-manifest-feat-ajda-pekkan-hileli",
+      "rank": 8,
+      "artist": "manifest feat. Ajda Pekkan",
+      "track": "Hileli",
+      "note_tr": "Pop türünde nesiller arası dev iş birliği",
+      "note_en": "Intergenerational giant pop collaboration",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-candan-ercetin-gamsiz-hayat",
+      "rank": 9,
+      "artist": "Candan Erçetin",
+      "track": "Gamsız Hayat",
+      "note_tr": "Nostalji akımıyla yeniden trend olan klasik",
+      "note_en": "Classic trending again with nostalgia wave",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-motive-yin-yang",
+      "rank": 10,
+      "artist": "Motive",
+      "track": "YIN YANG",
+      "note_tr": "Güçlü trap altyapılı hip-hop hiti",
+      "note_en": "Hip-hop hit with strong trap beats",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-karm6-karma",
+      "rank": 11,
+      "artist": "KARM6",
+      "track": "KARMA",
+      "note_tr": "Yeni nesil trap ve rap hiti",
+      "note_en": "New generation trap and rap hit",
+      "source": "Spotify TR"
+    },
+    {
+      "id": "tr-blok3-degistiremezsin-yazilmissa",
+      "rank": 12,
+      "artist": "BLOK3",
+      "track": "Değiştiremezsin Yazılmışsa",
+      "note_tr": "Duygusal sokak temalı melodik rap hiti",
+      "note_en": "Melodic rap hit with emotional street theme",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-manifest-feat-motive-and-pango-pvg-manifest-live-remix",
+      "rank": 13,
+      "artist": "manifest feat. Motive & Pango",
+      "track": "pVg (Manifest Live Remix)",
+      "note_tr": "Canlı performans remix başarısı yakalayan rap",
+      "note_en": "Rap track achieving live performance remix success",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-ahiyan-kralin-kizi",
+      "rank": 14,
+      "artist": "Ahiyan",
+      "track": "Kralın Kızı",
+      "note_tr": "Melodik rap türünde trend video başarısı",
+      "note_en": "Trend video success in melodic rap",
+      "source": "Spotify TR, Apple Music TR, YouTube TR"
+    },
+    {
+      "id": "tr-perma-bulamazsin",
+      "rank": 15,
+      "artist": "PERMA",
+      "track": "Bulamazsın",
+      "note_tr": "Alternatif tarzda trendlerde zirveye oynayan parça",
+      "note_en": "Alternative track challenging the top of trends",
+      "source": "Spotify TR, Apple Music TR, YouTube TR"
+    },
+    {
+      "id": "tr-blok3-kusura-bakma",
+      "rank": 16,
+      "artist": "BLOK3",
+      "track": "KUSURA BAKMA",
+      "note_tr": "Melodik rap türünde kararlı liste hiti",
+      "note_en": "Steady chart hit in melodic rap",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-crush-crush",
+      "rank": 17,
+      "artist": "CRUSH",
+      "track": "CRUSH!",
+      "note_tr": "R&B-pop tarzında enerjik dans altyapısı",
+      "note_en": "Energetic dance beats in R&B-pop style",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-manifest-daha-iyi",
+      "rank": 18,
+      "artist": "manifest",
+      "track": "Daha İyi",
+      "note_tr": "Melankolik indie tarzında alternatif pop hiti",
+      "note_en": "Alternative pop hit in melancholic indie style",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-ezhel-bana-ne-bu-sevdalardan",
+      "rank": 19,
+      "artist": "Ezhel",
+      "track": "Bana Ne Bu Sevdalardan",
+      "note_tr": "Reggae-rap tarzında küresel Türkçe rap esintisi",
+      "note_en": "Global Turkish rap breeze in reggae-rap style",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-hadise-ara-beni",
+      "rank": 20,
+      "artist": "Hadise",
+      "track": "Ara Beni",
+      "note_tr": "Dans pop türünde kulüp ve radyo favorisi",
+      "note_en": "Club and radio favorite in dance pop",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-sadece-celal-aksam-oldu-sokaklar-yine-tenha",
+      "rank": 21,
+      "artist": "Sadece Celal",
+      "track": "Akşam Oldu Sokaklar Yine Tenha",
+      "note_tr": "Arabesk-pop tarzında sokak kültürü ve viral",
+      "note_en": "Street culture and viral in arabesque-pop style",
+      "source": "Spotify TR, YouTube TR"
+    },
+    {
+      "id": "tr-poizi-basimda-belalar",
+      "rank": 22,
+      "artist": "Poizi",
+      "track": "Başımda Belalar",
+      "note_tr": "Karanlık atmosferli trap ve rap hiti",
+      "note_en": "Trap and rap hit with dark atmosphere",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-mabel-matiz-umrumdisi",
+      "rank": 23,
+      "artist": "Mabel Matiz",
+      "track": "Umrumdışı",
+      "note_tr": "Sanatsal ve özgün tarzda alternatif pop",
+      "note_en": "Alternative pop in artistic and unique style",
+      "source": "Apple Music TR"
+    },
+    {
+      "id": "tr-elif-buse-dogan-yangin-yeri",
+      "rank": 24,
+      "artist": "Elif Buse Doğan",
+      "track": "Yangın Yeri",
+      "note_tr": "Modern halk müziği ve pop sentezi",
+      "note_en": "Modern folk music and pop synthesis",
+      "source": "Spotify TR, Apple Music TR"
+    },
+    {
+      "id": "tr-motive-yuce-ask",
+      "rank": 25,
+      "artist": "Motive",
+      "track": "Yüce Aşk",
+      "note_tr": "Lirik ağırlıklı hip-hop ve rap parçası",
+      "note_en": "Lyric-heavy hip-hop and rap track",
+      "source": "Spotify TR"
+    }
+  ]
+}

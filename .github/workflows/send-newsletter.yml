@@ -1,0 +1,39 @@
+name: Send newsletter
+
+on:
+  schedule:
+    - cron: "0 7 * * 1" # Mondays 07:00 UTC (10:00 TR)
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "send = schedule broadcasts, draft = save as Kit drafts"
+        type: choice
+        options: [send, draft]
+        default: draft
+
+jobs:
+  newsletter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run Newsletter Dispatcher agent
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+          KIT_API_KEY: ${{ secrets.KIT_API_KEY }}
+          KIT_TAG: ${{ vars.KIT_TAG }}
+          KIT_TAG_ID_TR: ${{ secrets.KIT_TAG_ID_TR }}
+          KIT_TAG_ID_EN: ${{ secrets.KIT_TAG_ID_EN }}
+          KIT_SENDER_EMAIL: ${{ vars.KIT_SENDER_EMAIL }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: npm run agents:newsletter -- --${{ github.event.inputs.mode || 'send' }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: newsletter-html
+          path: out/

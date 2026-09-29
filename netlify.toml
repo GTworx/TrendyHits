@@ -1,0 +1,47 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  # like.mts falls back to the bundled trends.json when the site URL isn't reachable
+  included_files = ["public/data/trends.json"]
+
+[dev]
+  framework = "vite"
+  targetPort = 5173
+  port = 8888
+
+# Root: Turkish browsers -> /tr/, everyone else -> /en/
+[[redirects]]
+  from = "/"
+  to = "/tr/"
+  status = 302
+  force = true
+  conditions = { Language = ["tr"] }
+
+[[redirects]]
+  from = "/"
+  to = "/en/"
+  status = 302
+  force = true
+
+# SPA fallback: both language routes load the same index.html, language is read from the URL
+[[redirects]]
+  from = "/tr/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/en/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, must-revalidate"
