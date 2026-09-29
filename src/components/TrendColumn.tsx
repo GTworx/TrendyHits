@@ -9,9 +9,12 @@ interface Props {
   likes: LikesMap;
   likedIds: Set<string>;
   onLike: (track: Track) => void;
+  playingId: string | null;
+  progress: number;
+  onTogglePlay: (track: Track) => void;
 }
 
-export function TrendColumn({ title, subtitle, tracks, likes, likedIds, onLike }: Props) {
+export function TrendColumn({ title, subtitle, tracks, likes, likedIds, onLike, playingId, progress, onTogglePlay }: Props) {
   const { t } = useI18n();
 
   return (
@@ -33,6 +36,9 @@ export function TrendColumn({ title, subtitle, tracks, likes, likedIds, onLike }
             likes={likes[track.id] ?? 0}
             liked={likedIds.has(track.id)}
             onLike={onLike}
+            playing={playingId === track.id}
+            progress={playingId === track.id ? progress : 0}
+            onTogglePlay={onTogglePlay}
           />
         ))}
       </ol>

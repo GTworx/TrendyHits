@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 // Orchestrator Agent: runs the Global + TR research agents in parallel, hands their output to the
-// Formatter/Validator agent, validates deterministically and writes public/data/trends.json.
+// Formatter/Validator agent, adds artwork + audio previews (Media Enricher), validates deterministically
+// and writes public/data/trends.json.
 //
 //   npm run agents:trends                 # research + write public/data/trends.json
 //   npm run agents:trends -- --dry-run    # research, print summary, don't write
 //   npm run agents:trends -- --table --lang=tr   # print the side-by-side Markdown table (chat/preview mode)
+//   npm run agents:trends -- --media-only # only run the Media Enricher on the current trends.json
+//   npm run agents:trends -- --no-media   # skip artwork / preview lookup
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { args, argValue, log } from './lib/env.mjs';
@@ -12,6 +15,7 @@ import { generate, parseJsonLoose } from './lib/gemini.mjs';
 import { ORCHESTRATOR_PROMPT } from './lib/prompts.mjs';
 import { normalizeList, slugify, validateTrends } from './lib/normalize.mjs';
 import { fetchCharts } from './lib/charts.mjs';
+import { enrichMedia } from './lib/media.mjs';
 
 const OUT = 'public/data/trends.json';
 const TARGET = Number(argValue('count', 25));
@@ -154,19 +158,39 @@ async function main() {
     return;
   }
 
-  log('Orchestrator', `dispatching research agents in parallel (target ${TARGET}/list)`);
-  const [globalRaw, trRaw] = await Promise.all([research('global'), research('tr')]);
+  let global_trends;
+  let turkey_trends;
+  let last_updated;
 
-  const validated = await validate(globalRaw, trRaw);
-  let global_trends = normalizeList(validated.global_trends, 'global', previous?.global_trends);
-  let turkey_trends = normalizeList(validated.turkey_trends, 'tr', previous?.turkey_trends);
+  if (args.has('--media-only')) {
+    if (!previous) throw new Error(`--media-only needs an existing ${OUT}`);
+    ({ global_trends, turkey_trends, last_updated } = previous);
+  } else {
+    log('Orchestrator', `dispatching research agents in parallel (target ${TARGET}/list)`);
+    const [globalRaw, trRaw] = await Promise.all([research('global'), research('tr')]);
 
-  // Balance both columns to the same length
-  const n = Math.min(TARGET, global_trends.length, turkey_trends.length);
-  global_trends = global_trends.slice(0, n);
-  turkey_trends = turkey_trends.slice(0, n);
+    const validated = await validate(globalRaw, trRaw);
+    global_trends = normalizeList(validated.global_trends, 'global', previous?.global_trends);
+    turkey_trends = normalizeList(validated.turkey_trends, 'tr', previous?.turkey_trends);
 
-  const data = { last_updated: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'), global_trends, turkey_trends };
+    // Balance both columns to the same length
+    const count = Math.min(TARGET, global_trends.length, turkey_trends.length);
+    global_trends = global_trends.slice(0, count);
+    turkey_trends = turkey_trends.slice(0, count);
+    last_updated = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
+  }
+
+  // Media Enricher: artwork + 30s preview + Apple Music link (sequential because of the iTunes rate limit)
+  if (!args.has('--no-media')) {
+    const prevById = new Map([...(previous?.global_trends ?? []), ...(previous?.turkey_trends ?? [])].map((t) => [t.id, t]));
+    const mlog = (m) => log('MediaAgent', m);
+    mlog('looking up artwork and audio previews…');
+    global_trends = await enrichMedia(global_trends, 'global', prevById, mlog);
+    turkey_trends = await enrichMedia(turkey_trends, 'tr', prevById, mlog);
+  }
+  const n = global_trends.length;
+
+  const data = { last_updated, global_trends, turkey_trends };
   const errors = validateTrends(data);
   if (errors.length) {
     throw new Error(`Validation failed, ${OUT} left untouched:\n  - ${errors.join('\n  - ')}`);

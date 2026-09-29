@@ -1,6 +1,6 @@
 Bu sistemi uçtan uca hayata geçirmek için gereken mimariyi **3 katman** halinde kurgulayabiliriz. Tüm katmanlar **Netlify** üzerinde çalışır ve arayüz **Türkçe + İngilizce** iki dillidir:
 
-> 1. **Arayüz & Etkileşim (Frontend, statik):** Vite + React ile iki dilli (`/tr/`, `/en/`) dashboard: sol ve sağ listeler, her parçanın yanında canlı Like butonu ve alt kısımda Kit (kit.com) ile entegre bülten abonelik formu.
+> 1. **Arayüz & Etkileşim (Frontend, statik):** Vite + React ile iki dilli (`/tr/`, `/en/`) dashboard: sol ve sağ listeler, her parçanın yanında kapak görseli (thumbnail), 30 sn ses önizlemesi (▶️), canlı Like butonu ve alt kısımda Kit (kit.com) ile entegre bülten abonelik formu.
 > 2. **Arka Plan & Veritabanı (Netlify Functions + Postgres):** Like sayılarını tutan ve Kit API v4'e yeni aboneyi **dil etiketiyle** ekleyen serverless fonksiyonlar.
 > 3. **Agentic AI & Otomasyon (Newsletter Sender):** Belirli periyotlarla (örneğin haftada 1) trend listelerini çıkaran ve Kit Broadcasts API üzerinden abonelere **kendi dillerinde** şık bir e-posta bülteni gönderen ajan.
 
@@ -37,6 +37,10 @@ Tüm arayüz metinleri çeviri dosyalarından gelir; bileşenlerde hard-code met
   "lists.turkey": "🇹🇷 Türkiye Top Hits",
   "track.like": "Beğen",
   "track.liked": "Beğendin",
+  "track.play": "Önizlemeyi dinle",
+  "track.pause": "Durdur",
+  "track.openApple": "Apple Music'te aç",
+  "track.previewError": "Önizleme oynatılamadı.",
   "newsletter.title": "Trendleri e-posta ile al",
   "newsletter.description": "Her hafta Global ve Türkiye listeleri gelen kutunda.",
   "newsletter.placeholder": "E-posta adresin",
@@ -44,6 +48,7 @@ Tüm arayüz metinleri çeviri dosyalarından gelir; bileşenlerde hard-code met
   "newsletter.success": "Bültene başarıyla kaydoldun!",
   "newsletter.error": "Bir sorun oluştu, lütfen tekrar dene.",
   "footer.sources": "Kaynaklar",
+  "footer.previews": "Kapak görselleri ve 30 sn önizlemeler: Apple Music",
   "lang.tr": "Türkçe",
   "lang.en": "English"
 }
@@ -59,6 +64,10 @@ Tüm arayüz metinleri çeviri dosyalarından gelir; bileşenlerde hard-code met
   "lists.turkey": "🇹🇷 Turkey Top Hits",
   "track.like": "Like",
   "track.liked": "Liked",
+  "track.play": "Play preview",
+  "track.pause": "Pause",
+  "track.openApple": "Open in Apple Music",
+  "track.previewError": "Couldn't play the preview.",
   "newsletter.title": "Get the trends by email",
   "newsletter.description": "Global and Turkey charts in your inbox every week.",
   "newsletter.placeholder": "Your email address",
@@ -66,29 +75,87 @@ Tüm arayüz metinleri çeviri dosyalarından gelir; bileşenlerde hard-code met
   "newsletter.success": "You're subscribed to the newsletter!",
   "newsletter.error": "Something went wrong, please try again.",
   "footer.sources": "Sources",
+  "footer.previews": "Artwork and 30-second previews: Apple Music",
   "lang.tr": "Türkçe",
   "lang.en": "English"
 }
 ```
 
-#### **B. TrackRow bileşeni (iki dilli)**
+#### **B. TrackRow bileşeni (iki dilli, thumbnail + önizleme)**
 
-Her parçanın yanına interaktif bir beğeni butonu ve sayacı yerleştirilir. Not alanı seçili dile göre seçilir, sanatçı/parça adı çevrilmez, sayı locale'e göre formatlanır:
+Her parçanın solunda kapak görseli yer alır; görsel aynı zamanda 30 saniyelik önizlemeyi çalan ▶️ / ⏸ butonudur. Sayfada tek bir paylaşılan `<audio>` vardır (`usePreviewPlayer`): yeni bir önizleme başlayınca önceki durur. Sağda beğeni butonu ve sayacı bulunur. Not alanı seçili dile göre seçilir, sanatçı/parça adı çevrilmez, sayı locale'e göre formatlanır:
+
+```ts
+// src/hooks/usePreviewPlayer.ts — tek paylaşılan oynatıcı
+export function usePreviewPlayer(onError: () => void) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0); // 0..1
+
+  useEffect(() => {
+    const audio = new Audio();
+    audio.preload = 'none'; // ses sadece tıklanınca indirilir
+    audioRef.current = audio;
+    audio.addEventListener('timeupdate', () => setProgress(audio.currentTime / (audio.duration || 1)));
+    audio.addEventListener('ended', () => { setPlayingId(null); setProgress(0); });
+    return () => audio.pause();
+  }, []);
+
+  const toggle = useCallback((id: string, url: string) => {
+    const audio = audioRef.current!;
+    if (playingId === id) { audio.pause(); setPlayingId(null); return; }
+    audio.pause();
+    audio.src = url;
+    setPlayingId(id);
+    audio.play().catch(() => { setPlayingId(null); onError(); }); // → t('track.previewError')
+  }, [playingId, onError]);
+
+  return { playingId, progress, toggle };
+}
+```
 
 ```tsx
 // src/components/TrackRow.tsx
 import { useI18n } from '../i18n';
 
-export function TrackRow({ track, likes, liked, onLike }) {
+export function TrackRow({ track, likes, liked, onLike, playing, progress, onTogglePlay }) {
   const { t, lang, locale } = useI18n(); // lang: 'tr' | 'en', locale: 'tr-TR' | 'en-US'
   const note = lang === 'tr' ? track.note_tr : track.note_en;
 
+  const artwork = track.artwork_url
+    ? <img src={track.artwork_url} alt="" loading="lazy" width={48} height={48} className="h-12 w-12 object-cover" />
+    : <span className="flex h-12 w-12 items-center justify-center bg-gradient-to-br from-rose-400 to-indigo-500 font-bold text-white">
+        {track.track.charAt(0)}
+      </span>;
+
   return (
-    <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900">
+    <li className={`flex items-center justify-between gap-3 px-4 py-3 ${playing ? 'bg-rose-50 dark:bg-rose-950/20' : ''}`}>
       <div className="flex items-center gap-3 min-w-0">
         <span className="font-bold text-gray-500 w-6">{track.rank}</span>
+
+        {/* Thumbnail + Önizleme / Preview */}
+        {track.preview_url ? (
+          <button
+            onClick={() => onTogglePlay(track)}
+            aria-pressed={playing}
+            aria-label={`${playing ? t('track.pause') : t('track.play')}: ${track.artist} – ${track.track}`}
+            className="group relative h-12 w-12 shrink-0 overflow-hidden rounded-lg"
+          >
+            {artwork}
+            <span className={`absolute inset-0 flex items-center justify-center bg-black/45 text-white ${playing ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+              {playing ? '⏸' : '▶'}
+            </span>
+            {playing && <span className="absolute bottom-0 left-0 h-1 bg-rose-500" style={{ width: `${progress * 100}%` }} />}
+          </button>
+        ) : (
+          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg">{artwork}</div>
+        )}
+
         <div className="min-w-0">
-          <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">{track.track}</p>
+          {track.apple_music_url
+            ? <a href={track.apple_music_url} target="_blank" rel="noopener noreferrer" title={t('track.openApple')}
+                 className="block font-semibold truncate hover:underline">{track.track}</a>
+            : <p className="font-semibold truncate">{track.track}</p>}
           <p className="text-sm text-gray-500 truncate">{track.artist}</p>
           {note && <p className="text-xs text-gray-400 truncate">{note}</p>}
         </div>
@@ -106,10 +173,12 @@ export function TrackRow({ track, likes, liked, onLike }) {
         </svg>
         <span className="text-xs font-semibold">{new Intl.NumberFormat(locale).format(likes ?? 0)}</span>
       </button>
-    </div>
+    </li>
   );
 }
 ```
+
+> Görsel ve önizleme verisi (`artwork_url`, `preview_url`, `apple_music_url`) Media Enricher ajanından gelir (bkz. **TrendyHits 1.md**). Ses Apple CDN'inden doğrudan çalınır; ek bir backend fonksiyonu gerekmez.
 
 #### **C. Dil seçimi kuralları**
 
@@ -247,7 +316,7 @@ kendi abone kitlesine göndermektir.
 ---
 
 # CONTEXT & TOOLS
-- HTTP Fetch Tool: `{{SITE_URL}}/data/trends.json` (trend listeleri) ve `{{SITE_URL}}/api/likes` (beğeni sayıları).
+- HTTP Fetch Tool: `{{SITE_URL}}/data/trends.json` (trend listeleri + `artwork_url` / `preview_url` / `apple_music_url`) ve `{{SITE_URL}}/api/likes` (beğeni sayıları).
 - Kit Broadcast Tool / API: Bülten içeriğini ilgili dil etiketine (KIT_TAG_ID_TR / KIT_TAG_ID_EN) sahip abonelere Broadcast olarak gönderir.
 
 ---
@@ -266,8 +335,10 @@ kendi abone kitlesine göndermektir.
    - Önizleme metni (preview text): 1 cümle, konu satırını tekrar etme.
    - Giriş: Kısa, enerjik bir editoryal giriş yazısı. EN metni TR'nin birebir çevirisi değil, doğal İngilizce yazılmış olsun.
    - 2 Sütunlu Responsive HTML Kart Tasarımı (tablo tabanlı, inline CSS, mobilde alt alta):
-     * Sol: 🌍 Global Top Hits (Sıra, Sanatçı, Parça, Beğeni Sayısı)
-     * Sağ: 🇹🇷 Türkiye / Turkey Top Hits (Sıra, Sanatçı, Parça, Beğeni Sayısı)
+     * Sol: 🌍 Global Top Hits (Sıra, Kapak Görseli, Sanatçı, Parça, Beğeni Sayısı)
+     * Sağ: 🇹🇷 Türkiye / Turkey Top Hits (Sıra, Kapak Görseli, Sanatçı, Parça, Beğeni Sayısı)
+   - Kapak görseli: `artwork_url` → 40x40 `<img>` (width/height attribute + inline style, `alt=""`); yoksa renkli yedek kutu.
+   - E-posta istemcileri ses çalamaz: `apple_music_url` varsa parça adını oraya linkle (dinleyici önizlemeyi Apple Music'te açar).
    - Parça notları için dile göre `note_tr` / `note_en` kullan. Sanatçı ve parça adlarını ÇEVİRME.
    - Sayıları dile göre formatla (TR: 1.234 — EN: 1,234).
    - `<html lang="tr">` / `<html lang="en">` etiketini doğru ayarla.
@@ -365,9 +436,11 @@ GitHub Actions tarafında (Repo > Settings > Secrets): `KIT_API_KEY`, `KIT_TAG_I
 ```
 [ Kullanıcı Arayüzü — Netlify (statik, /tr/ & /en/) ]
 ├── Üst Bar: Dil Seçici (TR | EN)
-├── Sol Kolon: Global Trendler + [❤️ Like Butonu]
-├── Sağ Kolon: TR Trendler + [❤️ Like Butonu]
+├── Sol Kolon: Global Trendler + [🖼 Thumbnail · ▶️ 30 sn Önizleme] + [❤️ Like Butonu]
+├── Sağ Kolon: TR Trendler + [🖼 Thumbnail · ▶️ 30 sn Önizleme] + [❤️ Like Butonu]
 └── Alt Kısım: "Trendleri E-posta ile Al / Get the trends by email" Formu
+        │
+        ├── (0. ▶️ Tıklandı)      ──> [Tek paylaşılan <audio>] ──> [Apple CDN preview_url (30 sn)]
         │
         ├── (1. Like Tıklandı)   ──> [Netlify Function /api/like] ──> [Postgres: likes_count + 1]
         │
@@ -375,9 +448,9 @@ GitHub Actions tarafında (Repo > Settings > Secrets): `KIT_API_KEY`, `KIT_TAG_I
                                                                          ──> ["TrendyHits TR" / "TrendyHits EN" etiketli aboneler]
 
 [ Otomasyon — GitHub Actions ]
-├── Günlük:   Orchestrator Agent ──> public/data/trends.json commit ──> Netlify otomatik yeniden deploy
+├── Günlük:   Orchestrator Agent ──> Media Enricher (iTunes: kapak + önizleme) ──> public/data/trends.json commit ──> Netlify otomatik yeniden deploy
 └── Haftalık: Newsletter Agent
       ├── 1. trends.json + /api/likes verilerini analiz eder.
-      ├── 2. TR ve EN olmak üzere iki responsive HTML bülten derler.
+      ├── 2. TR ve EN olmak üzere iki responsive HTML bülten derler (kapak görselleri + Apple Music linkleri).
       └── 3. Kit Broadcasts API ile her dili kendi etiketli abonelerine postalar.
 ```

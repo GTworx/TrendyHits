@@ -10,6 +10,10 @@
   "lists.tracks": "tracks",
   "track.like": "Like",
   "track.liked": "Liked",
+  "track.play": "Play preview",
+  "track.pause": "Pause",
+  "track.openApple": "Open in Apple Music",
+  "track.previewError": "Couldn't play the preview.",
   "state.loading": "Loading charts…",
   "state.error": "Couldn't load the trend data. Please refresh the page.",
   "state.likeError": "Couldn't save your like, please try again.",
@@ -24,6 +28,7 @@
   "footer.sources": "Sources",
   "footer.language": "Language",
   "footer.note": "Charts are refreshed daily by AI agents.",
+  "footer.previews": "Artwork and 30-second previews: Apple Music",
   "lang.switch": "Choose language",
   "lang.tr": "Türkçe",
   "lang.en": "English"

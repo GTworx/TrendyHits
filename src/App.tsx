@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useI18n } from './i18n';
+import { useI18n, type TranslationKey } from './i18n';
 import type { LikesMap, Track, TrendsData } from './types';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { TrendColumn } from './components/TrendColumn';
 import { NewsletterForm } from './components/NewsletterForm';
+import { usePreviewPlayer } from './hooks/usePreviewPlayer';
 
 const LIKED_KEY = 'trendyhits.liked';
 const SOURCES = ['Spotify', 'Billboard', 'Apple Music', 'YouTube Music'];
@@ -31,7 +32,10 @@ export function App() {
   const [loadError, setLoadError] = useState(false);
   const [likes, setLikes] = useState<LikesMap>({});
   const [likedIds, setLikedIds] = useState<Set<string>>(readLiked);
-  const [likeError, setLikeError] = useState(false);
+  const [toast, setToast] = useState<TranslationKey | null>(null);
+  const showPreviewError = useCallback(() => setToast('track.previewError'), []);
+  const { playingId, progress, toggle } = usePreviewPlayer(showPreviewError);
+  const onTogglePlay = useCallback((track: Track) => track.preview_url && toggle(track.id, track.preview_url), [toggle]);
 
   useEffect(() => {
     fetch('/data/trends.json', { cache: 'no-cache' })
@@ -45,10 +49,10 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    if (!likeError) return;
-    const id = setTimeout(() => setLikeError(false), 4000);
+    if (!toast) return;
+    const id = setTimeout(() => setToast(null), 4000);
     return () => clearTimeout(id);
-  }, [likeError]);
+  }, [toast]);
 
   const onLike = useCallback(
     async (track: Track) => {
@@ -76,7 +80,7 @@ export function App() {
       } catch {
         markLiked(false);
         setLikes((m) => ({ ...m, [track.id]: Math.max(0, (m[track.id] ?? 1) - 1) }));
-        setLikeError(true);
+        setToast('state.likeError');
       }
     },
     [likedIds],
@@ -126,6 +130,9 @@ export function App() {
               likes={likes}
               likedIds={likedIds}
               onLike={onLike}
+              playingId={playingId}
+              progress={progress}
+              onTogglePlay={onTogglePlay}
             />
             <TrendColumn
               title={t('lists.turkey')}
@@ -134,6 +141,9 @@ export function App() {
               likes={likes}
               likedIds={likedIds}
               onLike={onLike}
+              playingId={playingId}
+              progress={progress}
+              onTogglePlay={onTogglePlay}
             />
           </div>
         )}
@@ -151,6 +161,7 @@ export function App() {
               {SOURCES.join(' · ')}
             </p>
             <p className="mt-1 text-xs">{t('footer.note')}</p>
+            <p className="mt-1 text-xs">{t('footer.previews')}</p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs">{t('footer.language')}</span>
@@ -159,9 +170,9 @@ export function App() {
         </div>
       </footer>
 
-      {likeError && (
+      {toast && (
         <div role="alert" className="fixed inset-x-4 bottom-4 z-20 mx-auto max-w-sm rounded-xl bg-zinc-900 px-4 py-3 text-center text-sm text-white shadow-lg dark:bg-white dark:text-zinc-900">
-          {t('state.likeError')}
+          {t(toast)}
         </div>
       )}
     </div>

@@ -10,6 +10,7 @@ Aşağıda orkestrasyon mantığını, doğrudan LLM / Agent çerçevenize (Lang
 * **Global Music Trend Agent (Araştırmacı 1):** Billboard Hot 100, Spotify Top 50 Global ve Apple Music Global listelerini tarayarak dünyada en çok dinlenen 20-30 parçayı çeker.
 * **TR Music Trend Agent (Araştırmacı 2):** Spotify Top 50 Türkiye, Apple Music Türkiye ve YouTube Music TR trendlerini tarayarak yerli ilk 20-30 parçayı çeker.
 * **Formatter/Validator Agent (Doğrulayıcı & Çıktı Üretici):** Sanatçı/parça adı imlalarını kontrol eder, duplicate veriyi temizler, her parça için **Türkçe ve İngilizce** kısa not üretir ve dashboard'un okuduğu `public/data/trends.json` dosyasını yazar.
+* **Media Enricher Agent (Görsel & Önizleme):** Doğrulanmış her parçayı ücretsiz ve anahtarsız **iTunes Search API** ile eşleştirir; kapak görseli (`artwork_url`), 30 saniyelik ses önizlemesi (`preview_url`) ve Apple Music linki (`apple_music_url`) ekler. Sanatçı + parça adı birlikte tutmayan sonuçları kabul etmez; eşleşme yoksa alanlar `null` kalır. Önceki `trends.json`'daki medya bilgisini `id` üzerinden yeniden kullanır; böylece günlük çalıştırmada sadece yeni parçalar sorgulanır (iTunes ~20 istek/dk sınırı).
 * **Dashboard Builder Agent (Geliştirici):** Bir kereye mahsus çalışır; iki dilli (TR/EN), Netlify'a deploy edilebilir dashboard projesini oluşturur (bkz. Bölüm 4).
 
 ### **2. Kapsamlı Sistem Prompt'u (System / Orchestrator Prompt)**
@@ -45,6 +46,11 @@ bunları iki dilli (Türkçe + İngilizce) bir dashboard'un doğrudan okuyabilec
    - Her parçaya kalıcı bir `id` ver: `{region}-{artist}-{track}` alanlarından küçük harf, ASCII, tire ile ayrılmış slug
      (örn. `tr-sezen-aksu-gidiyorum`). Aynı parça sonraki güncellemelerde AYNI id'yi almalı; Like sayıları bu id'ye bağlıdır.
    - Her iki listenin de parça sayılarını dengeli (örneğin tam 25'er veya 30'ar adet) tut.
+
+4. MEDIA ENRICHMENT (Media Enricher aracı tarafından yapılır, LLM üretmez):
+   - Her parça için kapak görseli (`artwork_url`, 200x200), 30 sn ses önizlemesi (`preview_url`) ve
+     Apple Music linki (`apple_music_url`) iTunes Search API'den alınır (TR listesi `country=tr`, Global `country=us`).
+   - URL UYDURMA; bu alanları asla tahminle doldurma. Eşleşme yoksa `null` bırak.
 
 ---
 
@@ -87,7 +93,10 @@ Dashboard ve bülten ajanı bu dosyayı okur. Dosya yolu: **`public/data/trends.
       "track": "...",
       "note_tr": "Viral TikTok hiti",
       "note_en": "Viral TikTok hit",
-      "source": "Spotify Global / Billboard"
+      "source": "Spotify Global / Billboard",
+      "artwork_url": "https://is1-ssl.mzstatic.com/image/thumb/.../200x200bb.jpg",
+      "preview_url": "https://audio-ssl.itunes.apple.com/itunes-assets/.../preview.m4a",
+      "apple_music_url": "https://music.apple.com/us/album/...?i=..."
     }
   ],
   "turkey_trends": [
@@ -98,7 +107,10 @@ Dashboard ve bülten ajanı bu dosyayı okur. Dosya yolu: **`public/data/trends.
       "track": "...",
       "note_tr": "Haftanın yükselişi",
       "note_en": "Riser of the week",
-      "source": "Spotify TR / YouTube TR"
+      "source": "Spotify TR / YouTube TR",
+      "artwork_url": "https://is1-ssl.mzstatic.com/image/thumb/.../200x200bb.jpg",
+      "preview_url": null,
+      "apple_music_url": null
     }
   ]
 }
@@ -107,6 +119,8 @@ Dashboard ve bülten ajanı bu dosyayı okur. Dosya yolu: **`public/data/trends.
 Kurallar:
 - `last_updated` ISO 8601 (UTC) formatındadır; dashboard bunu seçili dile göre (`tr-TR` / `en-US`) `Intl.DateTimeFormat` ile gösterir.
 - Arayüz metinleri (başlıklar, butonlar, form) JSON'da **yer almaz**; onlar dashboard'daki çeviri dosyalarından gelir (Bölüm 4).
+- `artwork_url`, `preview_url`, `apple_music_url` isteğe bağlıdır: ya `https://` URL'si ya da `null`. Dashboard `null` durumunda
+  yedek görsel gösterir ve oynat butonunu gizler. Önizleme sesi Apple'ın CDN'inden doğrudan çalınır (proxy yok).
 
 ### **4. Dashboard Builder Prompt'u (İki Dilli + Netlify Deploy)**
 
@@ -127,7 +141,9 @@ Türkçe ve İngilizce iki dilli bir müzik trend dashboard'u oluşturacaksın.
 # SAYFA YAPISI
 - Üst bar: logo "TrendyHits", son güncelleme tarihi, dil seçici (TR | EN)
 - İki sütun (mobilde alt alta): Sol 🌍 Global Top Hits, Sağ 🇹🇷 Türkiye Top Hits
-- Her satır: sıra, parça adı, sanatçı, seçili dile göre not (`note_tr` / `note_en`), ❤️ Like butonu + sayaç
+- Her satır: sıra, 48px kapak görseli (thumbnail), parça adı, sanatçı, seçili dile göre not (`note_tr` / `note_en`), ❤️ Like butonu + sayaç
+- Kapak görseli aynı zamanda ▶️ / ⏸ önizleme butonudur (30 sn, `preview_url`); çalan satır vurgulanır, görselin altında ilerleme çubuğu görünür
+- Parça adı `apple_music_url` varsa Apple Music'e (yeni sekmede) link verir
 - Alt kısım: "Trendleri e-posta ile al" / "Get the trends by email" abonelik formu
 - Footer: kaynaklar (Spotify, Billboard, Apple Music, YouTube Music) ve dil seçici
 
@@ -146,8 +162,17 @@ Türkçe ve İngilizce iki dilli bir müzik trend dashboard'u oluşturacaksın.
 
 Minimum çeviri anahtarları:
 `app.title, app.tagline, header.lastUpdated, lists.global, lists.turkey, track.like, track.liked,
+track.play, track.pause, track.openApple, track.previewError,
 newsletter.title, newsletter.description, newsletter.placeholder, newsletter.submit, newsletter.success,
-newsletter.error, footer.sources, lang.tr, lang.en`
+newsletter.error, footer.sources, footer.previews, lang.tr, lang.en`
+
+# THUMBNAIL & ÖNİZLEME (PREVIEW) GEREKSİNİMLERİ
+- Görseller `loading="lazy"`, sabit `width/height` (48px) ile yüklenir; `artwork_url` yoksa parça adının baş harfiyle gradient yedek kutu gösterilir.
+- Sayfada TEK bir paylaşılan `<audio>` vardır (`src/hooks/usePreviewPlayer.ts`): yeni önizleme başlayınca öncekini durdurur,
+  ikinci tıklama duraklatır, bitince sıfırlanır. `preload="none"` — ses sadece tıklanınca indirilir.
+- Oynat butonu erişilebilirdir: `aria-pressed`, dile göre `aria-label` (`track.play` / `track.pause` + sanatçı – parça), klavye odağında görünür.
+- `preview_url` yoksa oynat butonu gösterilmez; oynatma hatası seçili dilde `track.previewError` bildirimi ile gösterilir.
+- Footer'da `footer.previews` ile "Kapak görselleri ve önizlemeler: Apple Music" atfı yer alır.
 
 # VERİ
 - Trend verisi: `public/data/trends.json` (şema: "TrendyHits 1.md" Bölüm 3). Sayfa açılışında `fetch('/data/trends.json')`.
@@ -173,6 +198,7 @@ newsletter.error, footer.sources, lang.tr, lang.en`
 - 375px mobil genişlikte yatay kaydırma yok; iki sütun alt alta düşer.
 - Light / dark mode (`prefers-color-scheme`) desteklenir.
 - Like ve abonelik formu `netlify dev` altında çalışır; hata durumunda seçili dilde hata mesajı gösterilir.
+- Her parçada kapak görseli (veya yedek kutu) görünür; önizlemesi olan parçalar 30 sn çalınabilir ve aynı anda tek parça çalar.
 ```
 
 ### **5. Beklenen Proje Yapısı**
@@ -193,14 +219,20 @@ TrendyHits/
 │   ├── components/
 │   │   ├── LanguageSwitcher.tsx
 │   │   ├── TrendColumn.tsx
-│   │   ├── TrackRow.tsx
+│   │   ├── TrackRow.tsx            # thumbnail + ▶️ önizleme + like
 │   │   └── NewsletterForm.tsx
+│   ├── hooks/usePreviewPlayer.ts   # tek paylaşılan <audio> oynatıcı
 │   └── App.tsx
 ├── netlify/functions/
 │   ├── likes.mts                   # GET  /api/likes
 │   ├── like.mts                    # POST /api/like
 │   └── subscribe.mts               # POST /api/subscribe  (Kit)
-├── scripts/check-i18n.mjs
+├── scripts/
+│   ├── check-i18n.mjs
+│   └── agents/
+│       ├── orchestrator.mjs        # Global + TR araştırma → Validator → Media Enricher → trends.json
+│       ├── newsletter.mjs
+│       └── lib/media.mjs           # iTunes Search: artwork_url, preview_url, apple_music_url
 └── .github/workflows/
     ├── update-trends.yml
     └── send-newsletter.yml

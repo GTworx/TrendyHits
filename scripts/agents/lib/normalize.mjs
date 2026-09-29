@@ -65,6 +65,9 @@ export function validateTrends(data, min = 20) {
         if (typeof t[f] !== 'string' || !t[f]) errors.push(`${listName}[${i}].${f} missing`);
       }
       if (t.rank !== i + 1) errors.push(`${listName}[${i}].rank should be ${i + 1}`);
+      for (const f of ['artwork_url', 'preview_url', 'apple_music_url']) {
+        if (t[f] != null && !/^https:\/\//.test(t[f])) errors.push(`${listName}[${i}].${f} must be an https URL or null`);
+      }
     });
   }
   if (data.global_trends?.length !== data.turkey_trends?.length) errors.push('lists are not balanced');

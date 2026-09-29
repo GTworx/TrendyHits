@@ -15,9 +15,10 @@ Orchestrator (scripts/agents/orchestrator.mjs)
 ├── GlobalAgent ─┐  chart tools: Spotify Global (kworb), Billboard Hot 100, Apple Music US/UK
 ├── TRAgent ─────┤  chart tools: Spotify TR (kworb), Apple Music TR, YouTube TR trending
 │                │  (+ Google Search grounding when the Gemini key has quota)
-└── Validator ───┘  spelling, dedupe, note_tr/note_en, stable ids → public/data/trends.json
+├── Validator ───┘  spelling, dedupe, note_tr/note_en, stable ids
+└── MediaAgent      iTunes Search: artwork + 30s preview + Apple Music link → public/data/trends.json
 
-Dashboard (Vite + React + TS + Tailwind, /tr/ & /en/)
+Dashboard (Vite + React + TS + Tailwind, /tr/ & /en/) — thumbnails, ▶️ 30s previews, likes
 ├── GET  /api/likes      netlify/functions/likes.mts
 ├── POST /api/like       netlify/functions/like.mts       → Postgres (or Netlify Blobs fallback)
 └── POST /api/subscribe  netlify/functions/subscribe.mts  → Kit v4 subscriber + language tag
@@ -41,6 +42,7 @@ npx netlify-cli dev          # frontend + functions → http://localhost:8888
 ```
 - `npm run dev` yalnızca frontend'i açar (`/api/*` çalışmaz).
 - `npm run agents:trends -- --table --lang=tr` → iki sütunlu Markdown tablo önizlemesi.
+- `npm run agents:trends -- --media-only` → sadece kapak görselleri / önizlemeleri günceller (LLM çalışmaz).
 - `npm run agents:newsletter` → `out/newsletter-{tr,en}.html` üretir, **göndermez**. `--draft` Kit'te taslak oluşturur, `--send` gönderimi planlar.
 
 ### Netlify'a deploy
@@ -74,6 +76,7 @@ npx netlify-cli dev          # frontend + functions → http://localhost:8888
 ```
 - `npm run dev` runs the frontend only (`/api/*` won't work).
 - `npm run agents:trends -- --table --lang=en` → side-by-side Markdown table preview.
+- `npm run agents:trends -- --media-only` → refresh artwork / previews only (no LLM calls).
 - `npm run agents:newsletter` writes `out/newsletter-{tr,en}.html` and **sends nothing**. `--draft` creates Kit drafts, `--send` schedules the broadcasts.
 
 ### Deploy to Netlify
@@ -95,6 +98,7 @@ netlify.toml · .env.example · index.html · vite.config.ts
 public/data/trends.json          # Orchestrator output (data contract: TrendyHits 1.md §3)
 src/i18n/{tr,en}.json, index.tsx # translations, t(), useI18n()
 src/components/                  # LanguageSwitcher, TrendColumn, TrackRow, NewsletterForm
+src/hooks/usePreviewPlayer.ts     # single shared <audio> for 30s previews
 netlify/functions/               # likes.mts, like.mts, subscribe.mts
 netlify/lib/                     # likes store (Postgres | Blobs), trends loader
 shared/kit.mjs                   # Kit v4 client (functions + newsletter agent)

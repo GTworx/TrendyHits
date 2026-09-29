@@ -88,13 +88,20 @@ function column(title, list, lang, favorites) {
     .map((t) => {
       const fav = favorites.has(t.id);
       const note = lang === 'tr' ? t.note_tr : t.note_en;
-      return `<tr><td style="padding:10px 12px;border-bottom:1px solid #eeeef2;vertical-align:top;width:28px;font:800 14px/20px Arial,sans-serif;color:${t.rank <= 3 ? '#f43f5e' : '#a1a1aa'};">${t.rank}</td>
-<td style="padding:10px 0;border-bottom:1px solid #eeeef2;font:600 14px/20px Arial,sans-serif;color:#18181b;">${esc(t.track)}${fav ? ' <span style="font-size:12px;">❤️</span>' : ''}<br><span style="font-weight:400;color:#71717a;font-size:13px;">${esc(t.artist)}</span>${note ? `<br><span style="font-weight:400;color:#a1a1aa;font-size:12px;">${esc(note)}</span>` : ''}</td>
+      const art = t.artwork_url
+        ? `<img src="${esc(t.artwork_url)}" width="40" height="40" alt="" style="display:block;width:40px;height:40px;border-radius:6px;border:0;">`
+        : `<div style="width:40px;height:40px;border-radius:6px;background:#c026d3;"></div>`;
+      const title = t.apple_music_url
+        ? `<a href="${esc(t.apple_music_url)}" style="color:#18181b;text-decoration:none;">${esc(t.track)}</a>`
+        : esc(t.track);
+      return `<tr><td style="padding:10px 8px 10px 12px;border-bottom:1px solid #eeeef2;vertical-align:top;width:22px;font:800 14px/20px Arial,sans-serif;color:${t.rank <= 3 ? '#f43f5e' : '#a1a1aa'};">${t.rank}</td>
+<td style="padding:10px 10px 10px 0;border-bottom:1px solid #eeeef2;vertical-align:top;width:40px;">${art}</td>
+<td style="padding:10px 0;border-bottom:1px solid #eeeef2;font:600 14px/20px Arial,sans-serif;color:#18181b;">${title}${fav ? ' <span style="font-size:12px;">❤️</span>' : ''}<br><span style="font-weight:400;color:#71717a;font-size:13px;">${esc(t.artist)}</span>${note ? `<br><span style="font-weight:400;color:#a1a1aa;font-size:12px;">${esc(note)}</span>` : ''}</td>
 <td style="padding:10px 12px;border-bottom:1px solid #eeeef2;text-align:right;vertical-align:top;white-space:nowrap;font:600 12px/20px Arial,sans-serif;color:#e11d48;">♥ ${nf.format(t.likes)}</td></tr>`;
     })
     .join('\n');
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;border-collapse:separate;overflow:hidden;">
-<tr><td colspan="3" style="padding:14px 12px;font:800 17px/24px Arial,sans-serif;color:#18181b;border-bottom:1px solid #e4e4e7;">${title}</td></tr>
+<tr><td colspan="4" style="padding:14px 12px;font:800 17px/24px Arial,sans-serif;color:#18181b;border-bottom:1px solid #e4e4e7;">${title}</td></tr>
 ${rows}</table>`;
 }
 

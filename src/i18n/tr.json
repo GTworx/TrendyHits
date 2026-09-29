@@ -10,6 +10,10 @@
   "lists.tracks": "parça",
   "track.like": "Beğen",
   "track.liked": "Beğendin",
+  "track.play": "Önizlemeyi dinle",
+  "track.pause": "Durdur",
+  "track.openApple": "Apple Music'te aç",
+  "track.previewError": "Önizleme oynatılamadı.",
   "state.loading": "Listeler yükleniyor…",
   "state.error": "Trend verisi yüklenemedi. Lütfen sayfayı yenile.",
   "state.likeError": "Beğeni kaydedilemedi, lütfen tekrar dene.",
@@ -24,6 +28,7 @@
   "footer.sources": "Kaynaklar",
   "footer.language": "Dil",
   "footer.note": "Listeler yapay zekâ ajanları tarafından her gün güncellenir.",
+  "footer.previews": "Kapak görselleri ve 30 sn önizlemeler: Apple Music",
   "lang.switch": "Dil seç",
   "lang.tr": "Türkçe",
   "lang.en": "English"

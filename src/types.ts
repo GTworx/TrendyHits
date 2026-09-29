@@ -6,6 +6,10 @@ export interface Track {
   note_tr: string;
   note_en: string;
   source: string;
+  /** Media Enricher (iTunes Search API); null when no match was found */
+  artwork_url?: string | null;
+  preview_url?: string | null;
+  apple_music_url?: string | null;
 }
 
 export interface TrendsData {
